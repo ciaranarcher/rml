@@ -4,8 +4,8 @@ require 'minitest/autorun'
 
 require_relative '../roadmap_parser'
 
-describe 'title' do
-  let(:title) { '#this is a test title'}
+describe 'title text' do
+  let(:title) { 'This is a title text text blob!' }
   let(:cases) do
     [
       '#',
@@ -21,8 +21,22 @@ describe 'title' do
     cases.each { |c| assert RoadmapParser.new.parse(c) }
   end
 
-  it 'is useful' do
-    parsed = RoadmapParser.new.parse('# This is a title text text blob!')
-    pp parsed
+  it 'contains the title text after parsing' do
+    parsed = RoadmapParser.new.parse("# #{title}")
+    assert_equal title, parsed[:title]
+  end
+end
+
+describe 'timeline axis' do
+  let(:cases) do
+    [
+      '~ |==|',
+      '~ |==|',
+      '~  |==|'
+    ]
+  end
+
+  it 'parses successfully' do
+    cases.each { |c| assert RoadmapParser.new.parse(c) }
   end
 end
