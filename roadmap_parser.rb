@@ -12,6 +12,7 @@ class RoadmapParser < Parslet::Parser
 
   rule(:word) { match('[ -~]').repeat(1) >> space? } # ASCII characters
 
+
   # Title
   rule(:title_text) { word.repeat(0, MAX_TITLE_LEN).as(:title) }
   rule(:heading) { match('#').repeat(1) >> space? >> title_text }
@@ -19,14 +20,22 @@ class RoadmapParser < Parslet::Parser
   # Axis row
   rule(:axis) do
     axis_start >>
-      space? >> axis_section.repeat(0, MAX_AXIS_SECTIONS) >> 
+      space? >> axis_section.as(:axis_section)
+      .repeat(0, MAX_AXIS_SECTIONS).as(:axis_sections) >>
       axis_section_marker
   end
 
   rule(:axis_start) { match('~').repeat(1) }
   rule(:axis_section_marker) { match('\|').repeat(1) }
   rule(:axis_spacers) { match('=').repeat(1, MAX_AXIS_SPACERS) }
-  rule(:axis_section) { axis_section_marker >> axis_spacers }
+  rule(:axis_section_title) { match('[A-Za-x0-9]').repeat(1) }
+  rule(:axis_section) do
+    axis_section_marker >>
+      axis_spacers.as(:spacers_pre) >>
+      axis_section_title.as(:title) >>
+      axis_spacers.as(:spacers_post)
+  end
+
 
   rule(:expression) { heading | axis }
 
